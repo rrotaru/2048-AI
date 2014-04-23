@@ -537,6 +537,33 @@ Grid.prototype.maxValue = function() {
   return Math.log(max) / Math.log(2);
 }
 
+Grid.prototype.neighbors = function(cell) {
+  var neighbors = [];
+  if (cell.x < 3 && this.cellOccupied(this.indexes[cell.x+1][cell.y])) { 
+    neighbors.push(this.cells[cell.x+1][cell.y]);
+  }
+  if (cell.x > 0 && this.cellOccupied(this.indexes[cell.x-1][cell.y])) {
+    neighbors.push(this.cells[cell.x-1][cell.y]);
+  }
+  if (cell.y < 3 && this.cellOccupied(this.indexes[cell.x][cell.y+1])) {
+    neighbors.push(this.cells[cell.x][cell.y+1]);
+  }
+  if (cell.y > 0 && this.cellOccupied(this.indexes[cell.x][cell.y-1])) {
+    neighbors.push(this.cells[cell.x][cell.y-1]);
+  }
+
+  return neighbors;
+}
+
+Grid.prototype.cellValue = function(x, y, emptyval) {
+    var cell = this.cellContent({x:x, y:y});
+    if (cell === null) {
+        return emptyval; 
+    } else { 
+        return cell.value; 
+    }
+}
+
 // WIP. trying to favor top-heavy distributions (force consolidation of higher value tiles)
 /*
 Grid.prototype.valueSum = function() {

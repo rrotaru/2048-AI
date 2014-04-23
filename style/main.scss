@@ -560,3 +560,9 @@ hr {
     }
   }
 }
+
+button, .btn {
+  @include button;
+  border: none;
+  height: auto;
+}

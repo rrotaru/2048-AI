@@ -16,9 +16,11 @@ function GameManager(size, InputManager, Actuator) {
 
   this.inputManager.on('run', function() {
     if (this.running) {
+      debug.stop = new Date();
       this.running = false;
       this.actuator.setRunButton('Auto-run');
     } else {
+      debug.start = new Date();
       this.running = true;
       this.run()
       this.actuator.setRunButton('Stop');
@@ -71,12 +73,14 @@ GameManager.prototype.move = function(direction) {
       this.grid.computerMove();
     }
   } else {
+    debug.stop = new Date();
     this.won = true;
   }
 
   //console.log(this.grid.valueSum());
 
   if (!this.grid.movesAvailable()) {
+    debug.stop = new Date();
     this.over = true; // Game over!
   }
 

@@ -1,6 +1,84 @@
+var debug = {start: null, stop: null, done: null, iterations: 0}
+
 function AI(grid) {
   this.grid = grid;
 }
+
+AI.prototype.score = function() {
+  debug.iterations++;
+  var total = 0;
+  var maxes = [0, 0, 0, 0, 0, 0, 0, 0];
+  var v = [[],[],[],[]];
+  
+  for (var i=0; i<4; i++) {
+      for (var j=0; j<4; j++) {
+          // Nonempty cells get a score of their value.
+          if (this.grid.cellOccupied(this.grid.indexes[i][j])) {
+              var cell = this.grid.cellContent(this.grid.indexes[i][j]);
+              // Create an array 
+              v[i][j] = cell.value;
+
+              // Keep track of the max in each column and row for later.
+              if (cell.value > maxes[i]) maxes[i] = cell;
+              if (cell.value > maxes[4 + j]) maxes[j] = cell;
+
+              total += cell.value;
+
+          // Empty cells get a score of 10000
+          } else {
+              total += 10000;
+          }
+
+      }
+  }
+  for (var k=0; k<4; k++) {
+      if (maxes[k].x == 0 || maxes[k].x == 3) total += 20000;
+      if (maxes[4+k].y == 0 || maxes[4+k].y == 3) total += 20000;
+  
+      if (((v[k][0] < v[k][1]) && (v[k][1] < v[k][2]) && (v[k][2] < v[k][3])) || 
+          ((v[k][0] > v[k][1]) && (v[k][1] > v[k][2]) && (v[k][2] > v[k][3]))) 
+        total += 10000
+
+      if (((v[0][k] < v[1][k]) && (v[1][k] < v[2][k]) && (v[2][k] < v[3][k])) || 
+          ((v[0][k] > v[1][k]) && (v[1][k] > v[2][k]) && (v[2][k] > v[3][k]))) 
+        total += 10000
+  }
+  return total;
+}
+
+// expectimaxsearch --- ----
+AI.prototype.expectimaxsearch = function(depth) {
+  var bestScore;
+  var bestMove = -1;
+
+  for (var direction in [0, 1, 2, 3]) {
+      var newGrid = this.grid.clone();
+
+      if (newGrid.move(direction).moved) {
+          newGrid.addRandomTile();
+          //if (newGrid.isWin()) { return { move: direction } }
+          var newAI = new AI(newGrid);
+          var score = newAI.score();
+
+          if (depth > 0) {
+            var result = newAI.expectimaxsearch(depth-1);
+            score += result.score;
+          }
+
+          if (typeof bestScore === "undefined" || score > bestScore) {
+              bestScore = score;
+              bestMove = direction;
+          }
+      }
+  }
+
+  if (bestMove == -1) return { move: 3, score: 0, positions: 0, cutoffs: 0 };
+  return { move: bestMove, score: bestScore, positions: 0, cutoffs: 0 };
+
+};
+
+
+
 
 // static evaluation function
 AI.prototype.eval = function() {
@@ -28,11 +106,10 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
   var bestScore;
   var bestMove = -1;
   var result;
-
   // the maxing player
   if (this.grid.playerTurn) {
     bestScore = alpha;
-    for (var direction in [0, 1, 2, 3]) {
+    for (var direction in [0, 1, 2]) {
       var newGrid = this.grid.clone();
       if (newGrid.move(direction).moved) {
         positions++;
@@ -203,16 +280,17 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 
 // performs a search and returns the best move
 AI.prototype.getBest = function() {
-  return this.iterativeDeep();
+  //return this.iterativeDeep();
+  return this.expectimaxsearch(6);
 }
 
 // performs iterative deepening over the alpha-beta search
 AI.prototype.iterativeDeep = function() {
   var start = (new Date()).getTime();
-  var depth = 0;
+  var depth = 5;
   var best;
   do {
-    var newBest = this.search(depth, -10000, 10000, 0 ,0);
+    var newBest = this.expectimaxsearch(depth, -10000, 10000, 0 ,0);
     if (newBest.move == -1) {
       //console.log('BREAKING EARLY');
       break;
@@ -224,7 +302,7 @@ AI.prototype.iterativeDeep = function() {
   //console.log('depth', --depth);
   //console.log(this.translate(best.move));
   //console.log(best);
-  return best
+  return best;
 }
 
 AI.prototype.translate = function(move) {
