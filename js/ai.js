@@ -114,6 +114,7 @@ AI.prototype.score = function() {
   debug.iterations++;
   var total = 0;
   var maxes = [0, 0, 0, 0, 0, 0, 0, 0];
+  var maxcell;
   var v = [[],[],[],[]];
   
   for (var i=0; i<4; i++) {
@@ -128,6 +129,11 @@ AI.prototype.score = function() {
               if (cell.value > maxes[i]) maxes[i] = cell;
               if (cell.value > maxes[4 + j]) maxes[j] = cell;
 
+              // Keep track of the max cell
+              if (typeof maxcell === 'undefined' || maxcell.value < cell.value) {
+                  maxcell = cell;
+              }
+
               //total += cell.value;
 
           // Empty cells get a score of 10000
@@ -138,8 +144,9 @@ AI.prototype.score = function() {
       }
   }
   for (var k=0; k<4; k++) {
-      if (maxes[k].x == 0 || maxes[k].x == 3) total += 20000;
-      if (maxes[4+k].y == 0 || maxes[4+k].y == 3) total += 20000;
+      if (maxes[k].x == 3) total += 20000;
+      if (maxes[4+k].y == 0) total += 20000;
+      if ((maxcell.x == 0 || maxcell.x == 3) && (maxcell.y == 0 || maxcell.y == 3)) total += 40000;
   /*
       if (((v[k][0] < v[k][1]) && (v[k][1] < v[k][2]) && (v[k][2] < v[k][3])) || 
           ((v[k][0] > v[k][1]) && (v[k][1] > v[k][2]) && (v[k][2] > v[k][3]))) 
