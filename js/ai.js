@@ -1,10 +1,74 @@
-var debug = {start: null, stop: null, done: null, iterations: 0}
+var debug = {start: null, stop: null, done: null, iterations: 0};
 
-function AI(grid) {
-  this.grid = grid;
+function inRange(coords, vector) {
+  return ((0 <= coords.x+vector.x <= 3) && (0 <= coords.y+vector.y <= 3));
 }
 
-AI.prototype.score = function() {
+function AI(grid) {
+  debug.grid = grid;
+  this.grid = grid;
+  this.gridArray = [[0, 0, 0, 0],
+                    [0, 0, 0, 0],
+                    [0, 0, 0, 0], 
+                    [0, 0, 0, 0]];
+}
+
+AI.prototype.toarray = function(x, y, cell) {
+  this.gridarray[x + 4*y] = Math.log(cell.value) / Math.log(2);
+}
+/*
+AI.prototype.move = function(direction) {
+    var vector this.grid.vectors(direction);
+    
+    for (x = 0; x<4; x++) {
+        for (y = 0; y<4; y++) {
+            var newcoords = {x: vector.x+x, y: vector.y+y};
+            var val = this.gridArray[x][y];
+            while (inRange(newcoords, vector) && (gridArray[newcoords.x][newcoords.y] == 0)) {
+                newcoords.x += vector.x;
+                newcoords.y += vector.y;
+            }
+            if (inRange(newcoords, vector) (this.gridArray[newcoords.x+vector.x][newcoords.y+vector.y] == val) {
+                this.gridArray[newcoords.x+vector.x][newcoords.y+vector.y] == -1 * val * val;
+            } else {
+                this.gridArray[newcoords.x][newcoords.y] = val;
+            }
+            gridArray[x][y] = 0;
+        }
+    }
+    switch (direction) {
+        case 0: vector = -4; break;
+        case 1: vector =  1; break;
+        case 2: vector =  4; break;
+        case 3: vector = -1; break;
+        default: vector = 0;
+    }
+    // For each tile...
+    if (direction == 0 || direction == 2) {
+        for (i = 0; i < 16; i++) {
+            var newlocation = i+vector;
+          
+            // While the new location is still on the board and empty
+            while((0 <= newlocation+vector <= 15) && (this.gridArray[newlocation] == 0)) {
+                newlocation += vector;
+            }
+            if (0 <= this.gridArray
+
+
+            if (0 <= (i + vector) <= 15) {
+                var newlocation = i+vector;
+                while (this.gridArray[newlocation] == 0 &&) {
+                    newlocation += vector;
+                }
+                if (this.gridArray[i+vector] == 0) {
+
+                }
+            }
+        }
+    }
+}*/
+
+function AIscore(grid) {
   debug.iterations++;
   var total = 0;
   var maxes = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -13,8 +77,8 @@ AI.prototype.score = function() {
   for (var i=0; i<4; i++) {
       for (var j=0; j<4; j++) {
           // Nonempty cells get a score of their value.
-          if (this.grid.cellOccupied(this.grid.indexes[i][j])) {
-              var cell = this.grid.cellContent(this.grid.indexes[i][j]);
+          if (grid.cellOccupied(grid.indexes[i][j])) {
+              var cell = grid.cellContent(grid.indexes[i][j]);
               // Create an array 
               v[i][j] = cell.value;
 
@@ -42,6 +106,49 @@ AI.prototype.score = function() {
       if (((v[0][k] < v[1][k]) && (v[1][k] < v[2][k]) && (v[2][k] < v[3][k])) || 
           ((v[0][k] > v[1][k]) && (v[1][k] > v[2][k]) && (v[2][k] > v[3][k]))) 
         total += 10000
+  }
+  return total;
+}
+
+AI.prototype.score = function() {
+  debug.iterations++;
+  var total = 0;
+  var maxes = [0, 0, 0, 0, 0, 0, 0, 0];
+  var v = [[],[],[],[]];
+  
+  for (var i=0; i<4; i++) {
+      for (var j=0; j<4; j++) {
+          // Nonempty cells get a score of their value.
+          if (this.grid.cellOccupied(this.grid.indexes[i][j])) {
+              var cell = this.grid.cellContent(this.grid.indexes[i][j]);
+              // Create an array 
+              v[i][j] = cell.value;
+
+              // Keep track of the max in each column and row for later.
+              if (cell.value > maxes[i]) maxes[i] = cell;
+              if (cell.value > maxes[4 + j]) maxes[j] = cell;
+
+              //total += cell.value;
+
+          // Empty cells get a score of 10000
+          } else {
+              total += 10000;
+          }
+
+      }
+  }
+  for (var k=0; k<4; k++) {
+      if (maxes[k].x == 0 || maxes[k].x == 3) total += 20000;
+      if (maxes[4+k].y == 0 || maxes[4+k].y == 3) total += 20000;
+  /*
+      if (((v[k][0] < v[k][1]) && (v[k][1] < v[k][2]) && (v[k][2] < v[k][3])) || 
+          ((v[k][0] > v[k][1]) && (v[k][1] > v[k][2]) && (v[k][2] > v[k][3]))) 
+        total += 10000
+
+      if (((v[0][k] < v[1][k]) && (v[1][k] < v[2][k]) && (v[2][k] < v[3][k])) || 
+          ((v[0][k] > v[1][k]) && (v[1][k] > v[2][k]) && (v[2][k] > v[3][k]))) 
+        total += 10000
+  */
   }
   return total;
 }
@@ -77,6 +184,48 @@ AI.prototype.expectimaxsearch = function(depth) {
 
 };
 
+// randomwalkearch --- ----
+AI.prototype.randomwalksearch = function(depth, size) {
+  var bestScore = 0;
+  var bestMove = -1;
+
+  for (var direction in [0, 1, 2]) {
+      var sumScore = 0;
+      var averageScore;
+      var minScore;
+      
+      for (var i=0; i < size; i++) {
+          var newGrid = this.grid.clone();
+          var move = newGrid.move(direction);
+
+          if (move.moved) {
+              //if (newGrid.isWin()) { sumScore += 10000000; }
+              newGrid.addRandomTile();
+              var newAI = new AI(newGrid);
+              sumScore += newAI.score() + move.score;
+      
+              if (depth > 0) {
+                  var result = newAI.randomwalksearch(depth-1, size);
+                  sumScore += result.score;
+              }
+              if (typeof minScore === 'undefined' || sumScore < minScore) {
+                  minScore = sumScore;
+              }
+          }
+      }
+      averageScore = sumScore / size;
+
+      if (averageScore > bestScore) {
+      //if (minScore > bestScore) {
+          bestScore = averageScore;
+          bestMove = direction;
+      }
+  }
+
+  if (bestMove == -1) return { move: 3, score: 0};
+  return { move: bestMove, score: bestScore};
+
+};
 
 
 
@@ -281,7 +430,8 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 // performs a search and returns the best move
 AI.prototype.getBest = function() {
   //return this.iterativeDeep();
-  return this.expectimaxsearch(6);
+  //return this.expectimaxsearch(6);
+  return this.randomwalksearch(2, 8);
 }
 
 // performs iterative deepening over the alpha-beta search
