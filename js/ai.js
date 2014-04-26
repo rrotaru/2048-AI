@@ -1,6 +1,7 @@
 debug = {iterations: 0, start: null, stop: null};
 
 function AI(grid) {
+  debug.grid = grid;
   this.grid = grid;
 }
 
@@ -40,7 +41,7 @@ AI.prototype.score = function() {
   for (var k=0; k<4; k++) {
       if (maxes[k].x == 3) total += 20000;
       if (maxes[4+k].y == 0) total += 20000;
-      if ((maxcell.x == 0 || maxcell.x == 3) && (maxcell.y == 0 || maxcell.y == 3)) total += 80000;
+      if ((maxcell.x == 0 || maxcell.x == 3) && (maxcell.y == 0 || maxcell.y == 3)) total += 40000;
   /*
       if (((v[k][0] < v[k][1]) && (v[k][1] < v[k][2]) && (v[k][2] < v[k][3])) || 
           ((v[k][0] > v[k][1]) && (v[k][1] > v[k][2]) && (v[k][2] > v[k][3]))) 
@@ -332,7 +333,7 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 AI.prototype.getBest = function() {
   //return this.iterativeDeep();
   //return this.expectimaxsearch(6);
-  return this.randomwalksearch(2, 3);
+  return this.randomwalksearch(2, 8);
 }
 
 // performs iterative deepening over the alpha-beta search
