@@ -1,4 +1,4 @@
-debug = {iterations: 0, start: null, stop: null};
+debug = {iterations: 0, start: null, stop: null, depth: 2, simulations: 8};
 
 function AI(grid) {
   debug.grid = grid;
@@ -333,7 +333,7 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 AI.prototype.getBest = function() {
   //return this.iterativeDeep();
   //return this.expectimaxsearch(6);
-  return this.randomwalksearch(2, 8);
+  return this.randomwalksearch(debug.depth, debug.simulations);
 }
 
 // performs iterative deepening over the alpha-beta search
