@@ -77,7 +77,7 @@ AI.prototype.expectimaxsearch = function(depth) {
 
       if (newGrid.move(direction).moved) {
           newGrid.addRandomTile();
-          //if (newGrid.isWin()) { return { move: direction } }
+          if (newGrid.isWin()) { return { move: direction, score: Infinity } }
           var newAI = new AI(newGrid);
           var score = newAI.score();
 
