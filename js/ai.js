@@ -1,4 +1,4 @@
-debug = {iterations: 0, start: null, stop: null, depth: 2, simulations: 8};
+debug = {iterations: 0, start: null, stop: null, depth: 2, simulations: 7};
 
 function AI(grid) {
   debug.grid = grid;
@@ -8,7 +8,7 @@ function AI(grid) {
 AI.prototype.score = function() {
   debug.iterations++;
   var total = 0;
-  var maxes = [0, 0, 0, 0, 0, 0, 0, 0];
+  var maxes = [{value:0}, {value:0}, {value:0}, {value:0}, {value:0}, {value:0}, {value:0}, {value:0}];
   var maxcell;
   var v = [[],[],[],[]];
   
@@ -21,8 +21,8 @@ AI.prototype.score = function() {
               v[i][j] = cell.value;
 
               // Keep track of the max in each column and row for later.
-              if (cell.value > maxes[i]) maxes[i] = cell;
-              if (cell.value > maxes[4 + j]) maxes[j] = cell;
+              if (cell.value > maxes[i].value) maxes[i] = cell;
+              if (cell.value > maxes[4 + j].value) maxes[j] = cell;
 
               // Keep track of the max cell
               if (typeof maxcell === 'undefined' || maxcell.value < cell.value) {
@@ -33,25 +33,37 @@ AI.prototype.score = function() {
 
           // Empty cells get a score of 10000
           } else {
+              v[i][j] = 0;
               total += 10000;
           }
 
       }
   }
+  
   for (var k=0; k<4; k++) {
       if (maxes[k].x == 3) total += 20000;
       if (maxes[4+k].y == 0) total += 20000;
-      if ((maxcell.x == 0 || maxcell.x == 3) && (maxcell.y == 0 || maxcell.y == 3)) total += 40000;
-  /*
-      if (((v[k][0] < v[k][1]) && (v[k][1] < v[k][2]) && (v[k][2] < v[k][3])) || 
-          ((v[k][0] > v[k][1]) && (v[k][1] > v[k][2]) && (v[k][2] > v[k][3]))) 
+      
+      //if (v[0][k] < v[1][k] < v[2][k] < v[3][k]) total += 20000;
+
+      
+      //if (maxes[k].x == 3) total += 20000;
+      //if (maxes[4+k].y == 0) total += 20000;
+      if (((v[k][0] <= v[k][1]) && (v[k][1] <= v[k][2]) && (v[k][2] <= v[k][3])) || 
+          ((v[k][0] >= v[k][1]) && (v[k][1] >= v[k][2]) && (v[k][2] >= v[k][3]))) 
         total += 10000
 
-      if (((v[0][k] < v[1][k]) && (v[1][k] < v[2][k]) && (v[2][k] < v[3][k])) || 
-          ((v[0][k] > v[1][k]) && (v[1][k] > v[2][k]) && (v[2][k] > v[3][k]))) 
+      if (((v[0][k] <= v[1][k]) && (v[1][k] <= v[2][k]) && (v[2][k] <= v[3][k])) || 
+          ((v[0][k] >= v[1][k]) && (v[1][k] >= v[2][k]) && (v[2][k] >= v[3][k]))) 
         total += 10000
-  */
+      
   }
+  if ((maxcell.x == 0 || maxcell.x == 3) && (maxcell.y == 0 || maxcell.y == 3)) total += 40000;
+  //if ((maxcell.x == 3) && (maxcell.y == 0)) total += 320000;
+  //if (v[3][0] > v[3][1] > v[3][2] > v[3][3]) total += 100000;
+  //if (v[2][0] < v[2][1] < v[2][2] < v[2][3]) total += 100000;
+  //if (v[1][0] > v[1][1] > v[1][2] > v[1][3]) total += 100000;
+
   return total;
 }
 
@@ -91,7 +103,7 @@ AI.prototype.randomwalksearch = function(depth, size) {
   var bestScore = 0;
   var bestMove = -1;
 
-  for (var direction in [0, 1, 2]) {
+  for (var direction in [0, 1, 2, 3]) {
       var sumScore = 0;
       var averageScore;
       var minScore;
@@ -108,11 +120,12 @@ AI.prototype.randomwalksearch = function(depth, size) {
       
               if (depth > 0) {
                   var result = newAI.randomwalksearch(depth-1, size);
+                  if (result.score == 0) sumScore = 0;
                   sumScore += result.score;
               }
-              if (typeof minScore === 'undefined' || sumScore < minScore) {
-                  minScore = sumScore;
-              }
+              //if (typeof minScore === 'undefined' || sumScore < minScore) {
+              //    minScore = sumScore;
+              //}
           }
       }
       averageScore = sumScore / size;
@@ -124,7 +137,9 @@ AI.prototype.randomwalksearch = function(depth, size) {
       }
   }
 
-  if (bestMove == -1) return { move: 3, score: 0};
+  if (bestMove == -1) {
+    return { move: 3, score: 0};
+  }
   return { move: bestMove, score: bestScore};
 
 };
@@ -333,7 +348,9 @@ AI.prototype.search = function(depth, alpha, beta, positions, cutoffs) {
 AI.prototype.getBest = function() {
   //return this.iterativeDeep();
   //return this.expectimaxsearch(6);
-  return this.randomwalksearch(debug.depth, debug.simulations);
+  var best = this.randomwalksearch(debug.depth, debug.simulations);
+  //if (best.move == 3) window.alert('move left!');
+  return best;
 }
 
 // performs iterative deepening over the alpha-beta search
