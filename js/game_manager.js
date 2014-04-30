@@ -57,7 +57,6 @@ GameManager.prototype.setup = function () {
   if (previousState) {
     this.grid        = new Grid(previousState.grid.size,
                                 previousState.grid.cells); // Reload grid
-    this.ai           = new AI(this.grid);
     
     this.score       = previousState.score;
     this.over        = previousState.over;
@@ -74,6 +73,7 @@ GameManager.prototype.setup = function () {
     this.addStartTiles();
   }
 
+  this.ai          = new AI(this.grid);
   GameManager._instance = this;
 
   // Update the actuator

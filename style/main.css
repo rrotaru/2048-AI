@@ -498,7 +498,7 @@ hr {
   text-align: center;
   float: right; }
 
-.hint-button, .hint-feedback {
+.hint-button {
   display: inline-block;
   background: #8f7a66;
   border-radius: 3px;

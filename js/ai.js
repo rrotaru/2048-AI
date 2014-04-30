@@ -63,8 +63,9 @@ AI.prototype.expectimaxsearch = function(depth) {
 
   for (var direction in [0, 1, 2, 3]) {
       var newGrid = this.grid.clone();
+      var simulation = GameManager._instance.simulate(newGrid, direction);
 
-      if (newGrid.move(direction).moved) {
+      if (simulation.moved) {
           newGrid.addRandomTile();
           if (newGrid.isWin()) { return { move: direction, score: Infinity } }
           var newAI = new AI(newGrid);
