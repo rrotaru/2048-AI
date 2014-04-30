@@ -1,22 +1,22 @@
 .controls {
   margin-top: 1em;
-  padding: 0.5em;
   overflow: auto;
+  width: 100%;
 }
 
-.ai-button, #feedback-container {
+.feedback {
   font-size: xx-large;
-}
-
-#run-button-container {
-  float: right;
-}
-
-#hint-button-container, #feedback-container {
-  float: left;
-}
-
-#feedback-container {
+  line-height: 40px;
+  display: inline-block;
   margin-left: 1em;
   font-weight: bold;
+}
+
+.run-button { 
+  margin-right: 1em;
+}
+
+.ai-title {
+  font-size: 18pt;
+  vertical-align: text-top;
 }
