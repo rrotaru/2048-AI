@@ -498,6 +498,9 @@ hr {
   text-align: center;
   float: right; }
 
+.run-button { 
+  margin-right: 1em; }
+
 .hint-button {
   display: inline-block;
   background: #8f7a66;
@@ -515,7 +518,7 @@ hr {
 
 @media screen and (max-width: 520px) {
   html, body {
-    font-size: 15px; }
+    font-size: 14px; }
 
   body {
     margin: 20px 0;
@@ -538,17 +541,26 @@ hr {
     margin-bottom: 10px; }
 
   .game-intro {
-    width: 55%;
+    width: 100%;
     display: block;
     box-sizing: border-box;
     line-height: 1.65; }
 
-  .restart-button {
-    width: 42%;
+  .restart-button, .run-button, .hint-button {
+    width: 29%;
     padding: 0;
     display: block;
     box-sizing: border-box;
     margin-top: 2px; }
+
+  .run-button {
+    margin-right: 4px;
+  }
+
+  .feedback {
+    font-size: large !important;
+    margin-left: 12px !important;
+  }
 
   .game-container {
     margin-top: 17px;

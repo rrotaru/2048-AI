@@ -12,11 +12,13 @@
   font-weight: bold;
 }
 
-.run-button { 
-  margin-right: 1em;
-}
-
 .ai-title {
   font-size: 18pt;
   vertical-align: text-top;
+}
+
+@media screen and (max-width: 520px) {
+  .ai-title {
+    font-size: 10pt;
+  }
 }
